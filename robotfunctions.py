@@ -97,12 +97,16 @@ def backward(time, speed):
     stop_all()
 
 def strafe_right(time,speed):
+    FL_forward(speed + 35)
+    BL_backward(speed - 35)
     FR_backward(speed - 40)
     BR_forward(speed+30)
     sleep(time)
     stop_all()
 
 def strafe_left(time, speed):
+    FR_forward(speed - 35)
+    BR_backward(speed + 35)
     FL_backward(speed+20)
     BL_forward(speed-40)
     sleep(time)
@@ -112,9 +116,9 @@ def strafe_left(time, speed):
 # --------- TEST ---------
 i = 0
 while i < 10:
-    strafe_right(3, 75)
+    strafe_right(3, )
     sleep(4)
-    strafe_left(3, 75)
+    strafe_left(3, 50)
     i+=1
 
 
