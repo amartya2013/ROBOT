@@ -1,7 +1,6 @@
 from machine import Pin, PWM
 from time import sleep
 
-
 IN_1 = Pin(2, Pin.OUT)
 IN_2 = Pin(3, Pin.OUT)
 IN_3 = Pin(4, Pin.OUT)
@@ -10,115 +9,116 @@ IN_5 = Pin(6, Pin.OUT)
 IN_6 = Pin(7, Pin.OUT)
 IN_7 = Pin(8, Pin.OUT)
 IN_8 = Pin(9, Pin.OUT)
-
-
+PWM_1 = PWM(Pin(10))
+PWM_2 = PWM(Pin(11))
+PWM_3 = PWM(Pin(12))
+PWM_4 = PWM(Pin(13))
 
 for pwm in [PWM_1, PWM_2, PWM_3, PWM_4]:
-    pwm.freq(2000)
+    pwm.freq(500)
+
+# --------- MOTOR CONTROL ---------
+
+def stop_all():
+    IN_1.low(); IN_2.low()
+    IN_3.low(); IN_4.low()
+    IN_5.low(); IN_6.low()
+    IN_7.low(); IN_8.low()
 
 
-def back_right_forward():
-    IN_1.high()
-    IN_2.low()
-    
-def back_right_backward():
+
+def FR_forward(speed):
     IN_1.low()
     IN_2.high()
+    PWM_3.duty_u16(int(speed/ 100 * 65536))
     
-def back_left_forward():
-    IN_3.high()
-    IN_4.low()
     
-def back_left_backward():
+def FR_backward(speed):
+    IN_1.high()
+    IN_2.low()
+    PWM_3.duty_u16(int(speed/ 100 * 65535))
+    
+    
+def FL_forward(speed):
+    
     IN_3.low()
     IN_4.high()
-       
-def front_right_forward():
-    IN_7.high()
-    IN_8.low()
+    PWM_4.duty_u16(int(speed/ 100 * 65535))
+    
+    
+def FL_backward(speed):
+    IN_3.high()
+    IN_4.low()
+    PWM_4.duty_u16(int(speed/ 100 * 65535))
    
     
-def front_right_backward():
+def BR_forward(speed):
     IN_7.low()
     IN_8.high()
+    PWM_2.duty_u16(int(speed/ 100 * 65535))
     
-def front_left_forward():
-    IN_5.high()
-    IN_6.low()
     
-def front_left_backward():
+def BR_backward(speed):
+    IN_7.high()
+    IN_8.low()
+    PWM_2.duty_u16(int(speed/ 100 * 65535))
+    
+    
+def BL_forward(speed):
     IN_5.low()
     IN_6.high()
+    PWM_1.duty_u16(int(speed/ 100 * 65535))
     
-   
-
-
-def robot_forward(time):
-    back_right_forward()
-    back_left_forward()
-    front_right_forward()
-    front_left_forward()
-    sleep(time)
-    IN_1.low()
-    IN_2.low()
-    IN_3.low()
-    IN_4.low()
-    IN_5.low()
+    
+def BL_backward(speed):
+    IN_5.high()
     IN_6.low()
-    IN_7.low()
-    IN_8.low()
+    PWM_1.duty_u16(int(speed/ 100 * 65535))
     
-def robot_backward(time):
-    back_right_backward()
-    back_left_backward()
-    front_right_backward()
-    front_left_backward()
+
+# --------- MECANUM MOVEMENTS ---------
+
+def forward(time, speed):
+    print("huu")
+    FL_forward(speed)
+    FR_forward(speed)
+    BL_forward(speed)
+    BR_forward(speed)
     sleep(time)
-    IN_1.low()
-    IN_2.low()
-    IN_3.low()
-    IN_4.low()
-    IN_5.low()
-    IN_6.low()
-    IN_7.low()
-    IN_8.low()
+    stop_all()
 
-def robot_right(time):
-    back_right_backward()
-    front_right_backward()
-    back_left_forward()
-    front_left_forward()
+def backward(time, speed):
+    FL_backward(speed)
+    FR_backward(speed)
+    BL_backward(speed)
+    BR_backward(speed)
     sleep(time)
-    IN_1.low()
-    IN_2.low()
-    IN_3.low()
-    IN_4.low()
-    IN_5.low()
-    IN_6.low()
-    IN_7.low()
-    IN_8.low()
+    stop_all()
+
+def strafe_right(time,speed):
     
-def robot_left(time):
-    back_left_backward()
-    front_left_backward()
-    back_right_forward()
-    front_right_forward()
+    FR_backward(speed)
+    
+    BR_forward(speed)
     sleep(time)
-    IN_1.low()
-    IN_2.low()
-    IN_3.low()
-    IN_4.low()
-    IN_5.low()
-    IN_6.low()
-    IN_7.low()
-    IN_8.low()
-    
+    stop_all()
 
-robot_right(5)
-
+def strafe_left(time, speed):
+    FL_backward(speed)
     
+    BL_forward(speed)
     
+    sleep(time)
+    stop_all()
 
+
+# --------- TEST ---------
+i = 0
+while i < 10:
+    strafe_right(3, 75)
+    sleep(4)
+    strafe_left(3, 75)
+    i+=1
 
 
 
