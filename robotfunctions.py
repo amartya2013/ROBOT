@@ -34,6 +34,7 @@ def FR_forward(speed):
     
     
 def FR_backward(speed):
+    print("gh")
     IN_1.high()
     IN_2.low()
     PWM_3.duty_u16(int(speed/ 100 * 65535))
@@ -96,18 +97,14 @@ def backward(time, speed):
     stop_all()
 
 def strafe_right(time,speed):
-    
-    FR_backward(speed)
-    
-    BR_forward(speed)
+    FR_backward(speed - 40)
+    BR_forward(speed+30)
     sleep(time)
     stop_all()
 
 def strafe_left(time, speed):
-    FL_backward(speed)
-    
-    BL_forward(speed)
-    
+    FL_backward(speed+20)
+    BL_forward(speed-40)
     sleep(time)
     stop_all()
 
