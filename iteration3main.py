@@ -1,8 +1,12 @@
 from machine import Pin, PWM, UART
 from time import sleep
+import utime
 
+trigger = Pin(21, Pin.OUT)
+echo = Pin(20, Pin.IN)
 button = Pin(14, Pin.IN, Pin.PULL_DOWN)
-
+led1 = Pin(17, Pin.OUT)
+led2 = Pin(16, Pin.OUT)
 IN_1 = Pin(2, Pin.OUT)
 IN_2 = Pin(3, Pin.OUT)
 IN_3 = Pin(4, Pin.OUT)
@@ -15,6 +19,26 @@ PWM_1 = PWM(Pin(10))
 PWM_2 = PWM(Pin(11))
 PWM_3 = PWM(Pin(12))
 PWM_4 = PWM(Pin(13))
+
+def ultra():
+   trigger.low()
+   utime.sleep_us(2)
+   trigger.high()
+   utime.sleep_us(5)
+   trigger.low()
+   while echo.value() == 0:
+       signaloff = utime.ticks_us()
+   while echo.value() == 1:
+       signalon = utime.ticks_us()
+       
+   timepassed = signalon - signaloff
+   distance = (timepassed * 0.0343) / 2
+   
+   
+   return int(distance)
+
+
+
 
 for pwm in [PWM_1, PWM_2, PWM_3, PWM_4]:
     pwm.freq(500)
@@ -130,7 +154,6 @@ buffer = bytearray()
 while True:
     if uart.any():
         buffer += uart.read()
-        print(uart.read())
         # Keep processing while we have enough data
         while len(buffer) >= 8:
             # Find start byte
@@ -141,27 +164,57 @@ while True:
                 # Decode joystick
 
                 if packet[6] == 1:
-                    print('forward')
-                    forward(0.3, 75)
+                    if ultra() > 20:
+                        print('forward')
+                        forward(0.3, 75)
+                    else:
+                        continue
                 if packet[6] == 4:
                     print('left')
+                    led2.value(1)
                     left(0.3, 75)
+                    led2.value(0)
                 if packet[6] == 2:
                     print('backward')
                     backward(0.3, 75)
                 if packet[6] == 8:
                     print('right')
+                    led1.value(1)
                     right(0.3, 75)
+                    led1.value(0)
                 if packet[5] == 4:
-                    print('triange')
+                    if ultra() > 50:
+                        print('forward')
+                        forward(1, 100)
+                    else:
+                        continue
                 if packet[5] == 8:
                     print('circle')
+                    led1.value(1)
+                    right(1, 100)
+                    led1.value(0)
                 if packet[5] == 16:
-                    print('x')
+                    print('x mode')
+                    while True:
+                        data = ultra()
+                        print(data)
+                        if data > 20:
+                            forward(0.1, 55)
+                            continue
+                        if data >= 10 and data <= 20:
+                            sleep(0.1)
+                            continue
+                        if data < 10:
+                            backward(0.1, 55)
+                            continue
+                        if data < 5:
+                            break
+                        
+                    
                 if packet[5] == 32:
+                    led2.value(1)
                     print('square')
+                    left(1,100)
+                    led2.value(0)
 
            
-
-
-
